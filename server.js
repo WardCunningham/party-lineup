@@ -17,6 +17,7 @@ function keep(obj) {
 }
 
 async function handle(request) {
+  if (request.method === "OPTIONS") return preflight()
   let routes = {
     "/send": send,
     "/recall": recall,
@@ -31,6 +32,17 @@ async function handle(request) {
   } catch (err) {
     console.log(err)
     return new Response(`<pre>${err}</pre>`, {status:500})
+  }
+
+  function preflight() {
+    new Response(null, {
+      status: 204, // No content
+      headers: {
+        "Access-Control-Allow-Origin": request.headers.get("Origin") ?? "*",
+        "Access-Control-Allow-Methods": "PUT, GET, OPTIONS",
+        "Access-Control-Max-Age": "600",
+      },
+    })
   }
 
   function redirect() {
