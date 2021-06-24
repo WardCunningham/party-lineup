@@ -19,13 +19,14 @@ function keep(obj) {
 async function handle(request) {
   let routes = {
     "/send": send,
+    "/sendarg": sendarg,
     "/recall": recall,
     "/favicon.ico": flag,
     "/": redirect
   }
   let client = request.headers.get("x-forwarded-for")
   let { pathname, search, origin } = new URL(request.url)
-  if (request.method === "OPTIONS") return preflight()
+  // if (request.method === "OPTIONS") return preflight()
   post([{eventType:'PartyLineup', pathname, search, origin, client, started}])
   try {
     return await routes[pathname]()
@@ -34,16 +35,16 @@ async function handle(request) {
     return new Response(`<pre>${err}</pre>`, {status:500})
   }
 
-  function preflight() {
-    return new Response(null, {
-      status: 204, // No content
-      headers: {
-        "Access-Control-Allow-Origin": request.headers.get('Origin') || "*",
-        "Access-Control-Allow-Methods": "PUT, GET, OPTIONS",
-        "Access-Control-Max-Age": "600",
-      },
-    })
-  }
+  // function preflight() {
+  //   return new Response(null, {
+  //     status: 204, // No content
+  //     headers: {
+  //       "Access-Control-Allow-Origin": request.headers.get('Origin') || "*",
+  //       "Access-Control-Allow-Methods": "PUT, GET, OPTIONS",
+  //       "Access-Control-Max-Age": "600",
+  //     },
+  //   })
+  // }
 
   function redirect() {
     return Response.redirect(`http://ward.asia.wiki.org/assets/pages/party-lineup/client.html`, 302)
@@ -55,6 +56,16 @@ async function handle(request) {
     channel.postMessage(message)
     let headers = {"access-control-allow-origin": "*"}
     return new Response("ok", {headers})
+  }
+
+  async function sendarg() {
+    // let message = await request.json()
+    let message = JSON.parse(atob(search.replace(/\?/,'')))
+    console.log('sendarg',message)
+    keep(message)
+    channel.postMessage(message)
+    let headers = {"content-type": "application/json", "access-control-allow-origin": "*"}
+    return new Response(JSON.stringify(messages,null,2), {headers})
   }
 
   function recall() {

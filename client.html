@@ -22,6 +22,8 @@
   // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
   // https://github.com/fedwiki/wiki-plugin-transport/blob/master/client/transport.coffee
 
+  let server = 'https://party-lineup.deno.dev'
+  // let server = 'http://localhost:8080'
   let messages = []
 
   window.addEventListener("message", context)
@@ -48,21 +50,20 @@
     let html = dt.getData("text/html")
     let url = dt.getData("URL")
     let data = {text, html, url}
-    let options = {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
-    }
-    let response = await fetch(endpoint, options)
-    output.innerHTML += "<br>" + response.statusText
-    let page = await response.json()
-    output.innerHTML += "<br>" + page.title
-    let message = {
-      action: "showResult",
-      page,
-      keepLineup: event.shiftKey
-    }
-    window.parent.postMessage(message, "*");
+    console.log(data)
+    let segs = url.replace(/^[a-z]+:\/\//i,'').split(/\//)
+    let slug = segs.pop()
+    let site = segs.pop()
+    if (site=='view') site = segs.shift()
+    output.innerHTML += `<br>${site}/${slug}`
+    let page = await fetch(`http://${site}/${slug}.json`).then(res => res.json())
+    let title = page.title
+    output.innerHTML += `<br>${title}`
+    let message = {title, site, slug}
+    // let res = await fetch(`https://party-lineup.deno.dev/sendarg?${btoa(JSON.stringify(message))}`).then(res => res.json())
+    let res = await fetch(`${server}/sendarg?${btoa(JSON.stringify(message))}`).then(res => res.json())
+    output.innerHTML += `<br>${res.length} pages queued`
+    recall(res)
   }
 
   function doclick(event) {
@@ -76,8 +77,8 @@
     window.parent.postMessage(message, "*")
   }
 
-  async function recall() {
-    messages = await fetch(`https://party-lineup.deno.dev/recall`).then(res => res.json())
+  async function recall(update) {
+    messages = update || await fetch(`${server}/recall`).then(res => res.json())
     links.innerHTML = messages.map(message =>
       `<img width=16 height=16 src="//${message.site}/favicon.png">
       <span>${message.title}</span>`)
