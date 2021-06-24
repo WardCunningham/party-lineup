@@ -3,8 +3,9 @@
 // https://deno.com/deploy/docs/runtime-broadcast-channel
 
 const started = Date.now()
-const messages = []
 const channel = new BroadcastChannel("party-lineup")
+
+let messages = []
 channel.onmessage = (event) => keep(event.data)
 
 addEventListener("fetch", (event) => event.respondWith(handle(event.request)))
