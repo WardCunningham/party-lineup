@@ -35,7 +35,7 @@ async function handle(request) {
   }
 
   function preflight() {
-    new Response(null, {
+    return new Response(null, {
       status: 204, // No content
       headers: {
         "Access-Control-Allow-Origin": request.headers.get("Origin") ?? "*",
