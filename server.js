@@ -38,7 +38,7 @@ async function handle(request) {
     return new Response(null, {
       status: 204, // No content
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": request.get('origin') || "*",
         "Access-Control-Allow-Methods": "PUT, GET, OPTIONS",
         "Access-Control-Max-Age": "600",
       },
