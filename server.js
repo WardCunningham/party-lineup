@@ -17,7 +17,6 @@ function keep(obj) {
 }
 
 async function handle(request) {
-  if (request.method === "OPTIONS") return preflight()
   let routes = {
     "/send": send,
     "/recall": recall,
@@ -26,6 +25,7 @@ async function handle(request) {
   }
   let client = request.headers.get("x-forwarded-for")
   let { pathname, search, origin } = new URL(request.url)
+  if (request.method === "OPTIONS") return preflight()
   post([{eventType:'PartyLineup', pathname, search, origin, client, started}])
   try {
     return await routes[pathname]()
@@ -38,7 +38,7 @@ async function handle(request) {
     return new Response(null, {
       status: 204, // No content
       headers: {
-        "Access-Control-Allow-Origin": request.headers.get("Origin") ?? "*",
+        "Access-Control-Allow-Origin": origin ?? "*",
         "Access-Control-Allow-Methods": "PUT, GET, OPTIONS",
         "Access-Control-Max-Age": "600",
       },
