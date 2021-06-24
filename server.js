@@ -5,7 +5,7 @@
 const started = Date.now()
 const messages = []
 const channel = new BroadcastChannel("party-lineup")
-channel.onmessage = (event) => messages.keep(event.data)
+channel.onmessage = (event) => keep(event.data)
 
 addEventListener("fetch", (event) => event.respondWith(handle(event.request)))
 
@@ -38,7 +38,7 @@ async function handle(request) {
 
   async function send() {
     let message = await request.json()
-    messages.keep(message)
+    keep(message)
     channel.postMessage(message)
     let headers = {"access-control-allow-origin": "*"}
     return new Response("ok", {headers})
