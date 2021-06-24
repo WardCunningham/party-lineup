@@ -15,13 +15,14 @@
   <p id=output>waiting</p>
   <p id=dropzone ondrop="drop(event)" ondragover="over(event)" ondragenter="over(event)">drop here</p>
 </center>
+<p id=links onclick="doclick(event)"></p>
 
 <script>
 
   // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
   // https://github.com/fedwiki/wiki-plugin-transport/blob/master/client/transport.coffee
 
-  let endpoint = "http://home.c2.com:4010/image"
+  let messages = []
 
   window.addEventListener("message", context)
   let message = { action:"sendFrameContext" }
@@ -31,13 +32,6 @@
     if (data.action == "frameContext") {
       window.removeEventListener("message", context)
       const {site, slug, item, page} = data
-      let codes = page.story.filter(item => item.type == 'code')
-      if (codes && codes[0] && codes[0].text.match(/^http/)) {
-        endpoint = codes[0].text
-        output.innerHTML = 'ready'
-      } else {
-        output.innerHTML = 'Expected url in Code item'
-      }
     }
   }
 
@@ -70,5 +64,29 @@
     }
     window.parent.postMessage(message, "*");
   }
+
+  function doclick(event) {
+    let target = event.target
+    let obj = messages.find(obj => obj.title = target.innerText)
+    let message = {
+      action:"doInternalLink",
+      title: obj.title,
+      keepLineup: event.shiftKey
+    }
+    window.parent.postMessage(message, "*")
+  }
+
+  async function recall() {
+    messages = await fetch(`https://party-lineup.deno.dev/recall`).then(res => res.json())
+    links.innerHTML = messages.map(message =>
+      `<img width=16 height=16 src="//${message.site}/favicon.png">
+      <span>${message.title}</span>`)
+        .join('<br>')
+  }
+
+  recall()
+
+
+
 
 </script>

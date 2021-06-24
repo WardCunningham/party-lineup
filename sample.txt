@@ -1,0 +1,4 @@
+curl -s -d '{"title":"Channel Connects Edges","site":"found.ward.bay.wiki.org","slug":"channel-connects-edges"}' https://party-lineup.deno.dev/send
+curl -s -d '{"title":"Party Lineup","site":"ward.asia.wiki.org","slug":"party-lineup"}' https://party-lineup.deno.dev/send
+curl -s -d '{"title":"Outpost Thinking","site":"ward.asia.wiki.org","slug":"outpost-thinking"}' https://party-lineup.deno.dev/send
+curl -s -d '{"title":"Power Transporter","site":"ward.dojo.fed.wiki","slug":"power-transporter"}' https://party-lineup.deno.dev/send

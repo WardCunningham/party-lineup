@@ -5,10 +5,15 @@
 const started = Date.now()
 const messages = []
 const channel = new BroadcastChannel("party-lineup")
-channel.onmessage = (event) => messages.push(event.data)
+channel.onmessage = (event) => messages.keep(event.data)
 
 addEventListener("fetch", (event) => event.respondWith(handle(event.request)))
 
+function keep(obj) {
+  let want = messages.filter(o => o.site != obj.site || o.slug != obj.slug)
+  want.unshift(obj)
+  messages = want
+}
 
 async function handle(request) {
   let routes = {
@@ -33,7 +38,7 @@ async function handle(request) {
 
   async function send() {
     let message = await request.json()
-    messages.push(message)
+    messages.keep(message)
     channel.postMessage(message)
     let headers = {"access-control-allow-origin": "*"}
     return new Response("ok", {headers})
