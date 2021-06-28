@@ -30,7 +30,7 @@ async function handle(request) {
     "/sendarg": sendarg,
     "/recall": recall,
     "/favicon.ico": flag,
-    "/client": client,
+    "/client": proxy,
     "/": redirect
   }
   let client = request.headers.get("x-forwarded-for")
@@ -85,7 +85,7 @@ async function handle(request) {
     return new Response(text, { headers: { "content-type": "image/svg+xml" } })
   }
 
-  async function client() {
+  async function proxy() {
     let html = await fetch(`http://ward.asia.wiki.org/assets/pages/party-lineup/client.html`).then(res => res.text())
     return new Response(html, { headers: { "content-type": "text/html" } })
   }
