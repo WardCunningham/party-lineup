@@ -89,7 +89,7 @@
   async function recall(update) {
     messages = update || await fetch(`${server}/recall`).then(decode)
     links.innerHTML = messages.map(message =>
-      `<img width=16 height=16 src="//${message.site}/favicon.png">
+      `<img width=16 height=16 src="http://${message.site}/favicon.png">
       <span>${message.title}</span>`)
         .join('<br>')
   }
