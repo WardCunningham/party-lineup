@@ -30,6 +30,7 @@ async function handle(request) {
     "/sendarg": sendarg,
     "/recall": recall,
     "/favicon.ico": flag,
+    "/client": client,
     "/": redirect
   }
   let client = request.headers.get("x-forwarded-for")
@@ -82,6 +83,11 @@ async function handle(request) {
   function flag() {
     let text = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">☎️</text></svg>`
     return new Response(text, { headers: { "content-type": "image/svg+xml" } })
+  }
+
+  function client() {
+    let html = await fetch(`http://ward.asia.wiki.org/assets/pages/party-lineup/client.html`).then(res => res.text())
+    return new Response(html, { headers: { "content-type": "text/html" } })
   }
 }
 
