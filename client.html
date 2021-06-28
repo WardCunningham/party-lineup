@@ -42,16 +42,12 @@
     return false
   }
 
-  let isolate = ''
-  let started = 0
   // https://stackoverflow.com/questions/43344819/reading-response-headers-with-fetch-api
   function decode(res) {
     if (res.ok) {
-      console.log(res.headers)
-      isolate = res.headers.get('x-deno-ray')
-      started = res.headers.get('x-isolate-start')
-      console.log({isolate,started})
-      output.innerHTML += `<br>${isolate}<br>${started}`
+      let isolate = res.headers.get('x-deno-ray').split(/::/)[0]
+      let started = new Date(+res.headers.get('x-isolate-start')).toLocaleString()
+      output.innerHTML += `<br>${isolate} since ${started}`
       return res.json()
     }
   }
@@ -59,8 +55,7 @@
   async function drop(event) {
     event.preventDefault();
     let dt = event.dataTransfer
-    // output.innerHTML = dt.types.join(", ")
-    let text = dt.getData("text")
+     let text = dt.getData("text")
     let html = dt.getData("text/html")
     let url = dt.getData("URL")
     let data = {text, html, url}
@@ -69,12 +64,11 @@
     let slug = segs.pop()
     let site = segs.pop()
     if (site=='view') site = segs.shift()
-    output.innerHTML += `<br>${site}/${slug}`
+    output.innerHTML = `${site}/${slug}`
     let page = await fetch(`http://${site}/${slug}.json`).then(res => res.json())
     let title = page.title
     output.innerHTML += `<br>${title}`
     let message = {title, site, slug}
-    // let res = await fetch(`https://party-lineup.deno.dev/sendarg?${btoa(JSON.stringify(message))}`).then(res => res.json())
     let res = await fetch(`${server}/sendarg?${btoa(JSON.stringify(message))}`).then(decode)
     output.innerHTML += `<br>${res.length} pages queued`
     recall(res)
