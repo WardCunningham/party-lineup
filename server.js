@@ -85,7 +85,7 @@ async function handle(request) {
     return new Response(text, { headers: { "content-type": "image/svg+xml" } })
   }
 
-  function client() {
+  async function client() {
     let html = await fetch(`http://ward.asia.wiki.org/assets/pages/party-lineup/client.html`).then(res => res.text())
     return new Response(html, { headers: { "content-type": "text/html" } })
   }
