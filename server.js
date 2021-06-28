@@ -92,7 +92,6 @@ function post(data) {
       'Content-Type': 'application/json',
       'X-Insert-Key': Deno.env.get("INSIGHTS_INSERT_KEY")
     },
-    console.log(data)
     body: JSON.stringify(data),
   })
   .then(res => res.json())
