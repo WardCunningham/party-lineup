@@ -68,7 +68,7 @@
 
   function doclick(event) {
     let target = event.target
-    let obj = messages.find(obj => obj.title = target.innerText)
+    let obj = messages.find(obj => obj.title == target.innerText)
     let message = {
       action:"doInternalLink",
       title: obj.title,

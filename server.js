@@ -6,6 +6,11 @@ const started = Date.now()
 const channel = new BroadcastChannel("party-lineup")
 
 let messages = []
+let headers = {
+  "content-type": "application/json",
+  "access-control-allow-origin": "*",
+  "x-isolate-start": started
+}
 channel.onmessage = (event) => keep(event.data)
 
 addEventListener("fetch", (event) => event.respondWith(handle(event.request)))
@@ -52,24 +57,22 @@ async function handle(request) {
 
   async function send() {
     let message = await request.json()
+    message.client = client
     keep(message)
     channel.postMessage(message)
-    let headers = {"access-control-allow-origin": "*"}
-    return new Response("ok", {headers})
+    return new Response('{"ok":true}', {headers})
   }
 
   async function sendarg() {
     // let message = await request.json()
     let message = JSON.parse(atob(search.replace(/\?/,'')))
-    console.log('sendarg',message)
+    message.client = client
     keep(message)
     channel.postMessage(message)
-    let headers = {"content-type": "application/json", "access-control-allow-origin": "*"}
     return new Response(JSON.stringify(messages,null,2), {headers})
   }
 
   function recall() {
-      let headers = {"content-type": "application/json", "access-control-allow-origin": "*"}
       return new Response(JSON.stringify(messages,null,2), {headers})
   }
 
