@@ -5,6 +5,7 @@
 const started = Date.now()
 const channel = new BroadcastChannel("party-lineup")
 
+
 let messages = []
 let headers = {
   "content-type": "application/json",
