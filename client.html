@@ -42,10 +42,24 @@
     return false
   }
 
+  let isolate = ''
+  let started = 0
+  // https://stackoverflow.com/questions/43344819/reading-response-headers-with-fetch-api
+  function decode(res) {
+    if (res.ok) {
+      console.log(res.headers)
+      isolate = res.headers.get('x-deno-ray')
+      started = res.headers.get('x-isolate-start')
+      console.log({isolate,started})
+      output.innerHTML += `<br>${isolate}<br>${started}`
+      return res.json()
+    }
+  }
+
   async function drop(event) {
     event.preventDefault();
     let dt = event.dataTransfer
-    output.innerHTML = dt.types.join(", ")
+    // output.innerHTML = dt.types.join(", ")
     let text = dt.getData("text")
     let html = dt.getData("text/html")
     let url = dt.getData("URL")
@@ -61,7 +75,7 @@
     output.innerHTML += `<br>${title}`
     let message = {title, site, slug}
     // let res = await fetch(`https://party-lineup.deno.dev/sendarg?${btoa(JSON.stringify(message))}`).then(res => res.json())
-    let res = await fetch(`${server}/sendarg?${btoa(JSON.stringify(message))}`).then(res => res.json())
+    let res = await fetch(`${server}/sendarg?${btoa(JSON.stringify(message))}`).then(decode)
     output.innerHTML += `<br>${res.length} pages queued`
     recall(res)
   }
@@ -79,7 +93,7 @@
   }
 
   async function recall(update) {
-    messages = update || await fetch(`${server}/recall`).then(res => res.json())
+    messages = update || await fetch(`${server}/recall`).then(decode)
     links.innerHTML = messages.map(message =>
       `<img width=16 height=16 src="//${message.site}/favicon.png">
       <span>${message.title}</span>`)

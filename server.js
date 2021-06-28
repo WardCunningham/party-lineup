@@ -9,6 +9,8 @@ let messages = []
 let headers = {
   "content-type": "application/json",
   "access-control-allow-origin": "*",
+  "access-control-allow-headers": "*",
+  "access-control-expose-headers": "*",
   "x-isolate-start": started
 }
 channel.onmessage = (event) => keep(event.data)
